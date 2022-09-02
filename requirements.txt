@@ -1,0 +1,6 @@
+Flask==2.2.2  
+Flask-Bcrypt==1.0.1  
+flask-expects-json==1.7.0  
+flask-mongoengine==1.0.0  
+mongoengine==0.24.2 
+pymongo==4.2.0  
