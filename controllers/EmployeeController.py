@@ -4,6 +4,12 @@ import pymongo,mongoengine
 from email_validator import validate_email, EmailNotValidError
 
 def index():
+    """ Getting a list Employees
+        :Returns:
+            - Returns result of list operation
+        :Exceptions:
+            - DuplicateKeyError : if any duplicates are found
+    """        
     try:
         employeeList = getEmployeesList()
     except pymongo.errors.DuplicateKeyError:
@@ -12,6 +18,12 @@ def index():
         return employeeList
 
 def validateEmail(function):            
+    """ Validates an email
+        :Returns:
+            - Returns wrapped function if valid
+        :Exceptions:
+            - EmailNotValidError : if email found invalid
+    """            
     def wrapper():
         requestData = request.json    
         try:
@@ -27,6 +39,10 @@ def validateEmail(function):
     
 @validateEmail
 def addOrUpdate():
+    """ Add or update employee document
+        :Returns:
+            - Returns response according to operation status
+    """                
     requestData = request.json
     if 'employee_id' in requestData:
         # Update
@@ -58,6 +74,10 @@ def addOrUpdate():
         return resp
     
 def delete():
+    """ Attempts to Delete an employee document
+        :Returns:
+            - Returns response according to operation status
+    """                
     requestData = request.json
     try:
         employee = deleteEmployee(requestData)
@@ -69,6 +89,10 @@ def delete():
     return resp
 
 def view():
+    """ Attempts to View an employee document
+        :Returns:
+            - Returns single employee details if successful
+    """                    
     requestData = request.json
     try:
         employee = getSingleEmployee(requestData)
