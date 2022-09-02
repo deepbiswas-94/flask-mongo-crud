@@ -3,6 +3,8 @@ from models.Employees import getEmployeesList,createEmployee,getSingleEmployee,a
 import pymongo,mongoengine
 from email_validator import validate_email, EmailNotValidError
 
+prepareResponse = lambda *args, **kwargs: (jsonify(args[0]), 200)
+
 def employeeList():
     """ Getting a list Employees
         :Returns:
@@ -15,7 +17,7 @@ def employeeList():
     except pymongo.errors.DuplicateKeyError:
         pass
     finally:
-        return jsonify(employeeList),200
+        return prepareResponse({"data": employeeList,"status":True})        
 
 def validateEmail(function):            
     """ Validates an email
@@ -30,8 +32,7 @@ def validateEmail(function):
             validation = validate_email(requestData['email'], check_deliverability=True)            
             email = validation.email        
         except EmailNotValidError as e:
-            resp = jsonify('Employee email invalid'), 200
-            return resp                      
+            return prepareResponse({"message": 'Employee email invalid',"status":False})                    
         else:        
             return function()
     return wrapper
@@ -48,22 +49,22 @@ def addOrUpdate():
         try:
             status = updateEmployee(requestData)
         except:
-            resp = jsonify('Something went wrong'), 200
+            resp = prepareResponse({"message": 'Something went wrong',"status":False})                    
         else:
-            resp = jsonify('Employee update Success'), 200
+            resp = prepareResponse({"message": 'Employee update successful',"status":True})
         return resp          
     else:
         # Insert
         try:            
             status = createEmployee(requestData)
         except pymongo.errors.DuplicateKeyError:
-            resp = jsonify('Employee Insert failed'), 200
+            resp = prepareResponse({"message": 'Something went wrong',"status":False})  
         except KeyError:
-            resp = jsonify('Something went wrong'), 200
+            resp = prepareResponse({"message": 'Something went wrong',"status":False})  
         except mongoengine.errors.NotUniqueError:
-            resp = jsonify('This user already exists'), 200
+            resp = prepareResponse({"message": 'This user already exists',"status":False})  
         else:        
-            resp = jsonify('Employee insert Success'), 200
+            resp = prepareResponse({"message": 'Employee added successfully',"status":True})   
         return resp
     
 def deleteEmployee():
@@ -74,9 +75,9 @@ def deleteEmployee():
     requestData = request.json
     try:
         employee = attemptDeleteEmployee(requestData)
-        resp = jsonify('Employee delete Success'), 200
+        resp = prepareResponse({"message": 'Delete Successful',"status":True})  
     except:
-        resp = jsonify('Employee delete Failed'), 200
+        resp = prepareResponse({"message": 'Something went wrong',"status":False})  
     return resp
 
 def viewEmployee():
@@ -88,7 +89,7 @@ def viewEmployee():
     try:
         employee = getSingleEmployee(requestData)
     except:
-        resp = jsonify('Something went wrong'), 200
+        resp = prepareResponse({"message": 'Something went wrong',"status":False})  
         return resp       
     else:
-        return employee
+        return prepareResponse({"data": employee,"status":True})  
