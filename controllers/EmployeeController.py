@@ -1,9 +1,9 @@
 from flask import jsonify,request
-from models.Employees import getEmployeesList,createEmployee,getSingleEmployee,deleteEmployee,updateEmployee
+from models.Employees import getEmployeesList,createEmployee,getSingleEmployee,attemptDeleteEmployee,updateEmployee
 import pymongo,mongoengine
 from email_validator import validate_email, EmailNotValidError
 
-def index():
+def employeeList():
     """ Getting a list Employees
         :Returns:
             - Returns result of list operation
@@ -15,7 +15,7 @@ def index():
     except pymongo.errors.DuplicateKeyError:
         pass
     finally:
-        return employeeList
+        return jsonify(employeeList),200
 
 def validateEmail(function):            
     """ Validates an email
@@ -30,8 +30,7 @@ def validateEmail(function):
             validation = validate_email(requestData['email'], check_deliverability=True)            
             email = validation.email        
         except EmailNotValidError as e:
-            resp = jsonify('Employee email invalid')
-            resp.status = 200   
+            resp = jsonify('Employee email invalid'), 200
             return resp                      
         else:        
             return function()
@@ -49,46 +48,38 @@ def addOrUpdate():
         try:
             status = updateEmployee(requestData)
         except:
-            resp = jsonify('Something went wrong')
-            resp.status = 200   
+            resp = jsonify('Something went wrong'), 200
         else:
-            resp = jsonify('Employee update Success')
-            resp.status = 200  
+            resp = jsonify('Employee update Success'), 200
         return resp          
     else:
         # Insert
         try:            
             status = createEmployee(requestData)
         except pymongo.errors.DuplicateKeyError:
-            resp = jsonify('Employee Insert failed')
-            resp.status = 200             
+            resp = jsonify('Employee Insert failed'), 200
         except KeyError:
-            resp = jsonify('Something went wrong')
-            resp.status = 200          
+            resp = jsonify('Something went wrong'), 200
         except mongoengine.errors.NotUniqueError:
-            resp = jsonify('This user already exists')
-            resp.status = 200              
+            resp = jsonify('This user already exists'), 200
         else:        
-            resp = jsonify('Employee insert Success')
-            resp.status = 200             
+            resp = jsonify('Employee insert Success'), 200
         return resp
     
-def delete():
+def deleteEmployee():
     """ Attempts to Delete an employee document
         :Returns:
             - Returns response according to operation status
     """                
     requestData = request.json
     try:
-        employee = deleteEmployee(requestData)
-        resp = jsonify('Employee delete Success')
-        resp.status = 200         
+        employee = attemptDeleteEmployee(requestData)
+        resp = jsonify('Employee delete Success'), 200
     except:
-        resp = jsonify('Employee delete Failed')
-        resp.status = 200         
+        resp = jsonify('Employee delete Failed'), 200
     return resp
 
-def view():
+def viewEmployee():
     """ Attempts to View an employee document
         :Returns:
             - Returns single employee details if successful
@@ -97,8 +88,7 @@ def view():
     try:
         employee = getSingleEmployee(requestData)
     except:
-        resp = jsonify('Something went wrong')
-        resp.status = 200  
+        resp = jsonify('Something went wrong'), 200
         return resp       
     else:
         return employee

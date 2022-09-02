@@ -1,9 +1,9 @@
 from flask import Blueprint
-from controllers.EmployeeController import index,addOrUpdate,view,delete
+from controllers.EmployeeController import employeeList,addOrUpdate,viewEmployee,deleteEmployee
 
 router = Blueprint('router',__name__,url_prefix='/employee')
 
-router.route('list', methods=['GET'])(index)
+router.route('list', methods=['GET'])(employeeList)
 router.route('addOrUpdate', methods=['POST'])(addOrUpdate)
-router.route('view', methods=['GET'])(view)
-router.route('delete', methods=['POST'])(delete)
+router.route('view', methods=['GET'])(viewEmployee)
+router.route('delete', methods=['POST'])(deleteEmployee)

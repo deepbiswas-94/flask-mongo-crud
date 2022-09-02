@@ -21,7 +21,7 @@ def getEmployeesList():
             - Return list of employees in JSON format
     """     
     employees = Employees.objects()
-    return jsonify(employees), 200    
+    return employees    
 
 def hashPassword(function):
     """ Generate Hash for a password
@@ -44,7 +44,7 @@ def createEmployee(data):
     newEmployeeId = getEmployeeCount() + 1
     newEmployee = Employees(name=data['name'],email=data['email'],password=data['password'],employee_id=newEmployeeId)
     status = newEmployee.save(validate=True)
-    return jsonify(status), 200
+    return status
 
 def getSingleEmployee(data):
     """ Get details of a single employee
@@ -54,7 +54,7 @@ def getSingleEmployee(data):
             - Returns detail of the employee
     """        
     employees = Employees.objects.get_or_404(employee_id=data['employee_id'])
-    return jsonify(employees), 200    
+    return employees 
 
 def getEmployeeCount():
     """ Getting number of employees
@@ -64,7 +64,7 @@ def getEmployeeCount():
     count = Employees.objects().count()
     return count
 
-def deleteEmployee(data):
+def attemptDeleteEmployee(data):
     """ Delete a Employee document 
         :Parameters:
             - `data`:Dictionary containing employee_id
@@ -73,7 +73,7 @@ def deleteEmployee(data):
     """            
     employee = Employees.objects.get_or_404(employee_id=data['employee_id'])
     employee.delete()
-    return jsonify(str(employee.id)), 200
+    return str(employee.id)
 
 def updateEmployee(data):
     """ Update Single a Employee document 
@@ -84,4 +84,4 @@ def updateEmployee(data):
     """    
     employees = Employees.objects.get_or_404(employee_id=data['employee_id'])
     employees.update(**data)
-    return jsonify(str(employees.id)), 200
+    return str(employees.id)
