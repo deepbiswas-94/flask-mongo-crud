@@ -18,7 +18,7 @@ def getEmployeesList():
     """ Getting a list of employees
         >>> Employees.objects()
         :Returns:
-            - Return list of employees in JSON format
+            - Return list of employees
     """     
     employees = Employees.objects()
     return employees    
